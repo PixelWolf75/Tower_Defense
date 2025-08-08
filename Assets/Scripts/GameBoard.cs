@@ -16,6 +16,8 @@ public class GameBoard : MonoBehaviour
     Vector2Int size;
     GameTile[] tiles;
 
+    List<GameTile> spawnPoints = new List<GameTile>();
+
     Queue<GameTile> searchFrontier = new Queue<GameTile>();
     GameTileContentFactory contentFactory;
 
@@ -65,6 +67,7 @@ public class GameBoard : MonoBehaviour
         }
     }
 
+    public int SpawnPointCount => spawnPoints.Count;
 
     public void Initialize(Vector2Int size, GameTileContentFactory contentFactory)
     {
@@ -224,6 +227,11 @@ public class GameBoard : MonoBehaviour
         return null;
     }
 
+    public GameTile GetSpawnPoint(int index)
+    {
+        return spawnPoints[index];
+    }
+
     public void ToggleDestination(GameTile tile)
     {
         if (tile.Content.Type == GameTileContentType.Destination)
@@ -265,6 +273,23 @@ public class GameBoard : MonoBehaviour
             {
                 Debug.Log("FindPaths returned true - wall kept");
             }
+        }
+    }
+
+    public void ToggleSpawnPoint(GameTile tile)
+    {
+        if (tile.Content.Type == GameTileContentType.SpawnPoint)
+        {
+            if (spawnPoints.Count > 1)
+            {
+                spawnPoints.Remove(tile);
+                tile.Content = contentFactory.Get(GameTileContentType.Empty);
+            }
+        }
+        else if (tile.Content.Type == GameTileContentType.Empty)
+        {
+            tile.Content = contentFactory.Get(GameTileContentType.SpawnPoint);
+            spawnPoints.Add(tile);
         }
     }
 

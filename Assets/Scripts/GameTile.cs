@@ -13,6 +13,8 @@ public class GameTile : MonoBehaviour
 
     int distance;
 
+    public GameTile NextTileOnPath => nextOnPath;
+
     static Quaternion
     northRotation = Quaternion.Euler(90f, 0f, 0f),
     eastRotation = Quaternion.Euler(90f, 90f, 0f),
