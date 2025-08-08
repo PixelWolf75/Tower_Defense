@@ -10,17 +10,68 @@ public class GameBoard : MonoBehaviour
     [SerializeField]
     GameTile tilePrefab = default;
 
+    [SerializeField]
+    Texture2D gridTexture = default;
+
     Vector2Int size;
     GameTile[] tiles;
 
     Queue<GameTile> searchFrontier = new Queue<GameTile>();
+    GameTileContentFactory contentFactory;
 
-    public void Initialize(Vector2Int size)
+    bool showPaths, showGrid;
+
+    public bool ShowPaths
+    {
+        get => showPaths;
+        set
+        {
+            showPaths = value;
+            if (showPaths)
+            {
+                Debug.Log("Showing arrows");
+                foreach (GameTile tile in tiles)
+                {
+                    tile.ShowPath();
+                }
+            }
+            else
+            {
+                Debug.Log("Hiding arrows");
+                foreach (GameTile tile in tiles)
+                {
+                    tile.HidePath();
+                }
+            }
+        }
+    }
+
+    public bool ShowGrid
+    {
+        get => showGrid;
+        set
+        {
+            showGrid = value;
+            Material m = ground.GetComponent<MeshRenderer>().material;
+            if (showGrid)
+            {
+                m.mainTexture = gridTexture;
+                m.SetTextureScale("_MainTex", size);
+            }
+            else
+            {
+                m.mainTexture = null;
+            }
+        }
+    }
+
+
+    public void Initialize(Vector2Int size, GameTileContentFactory contentFactory)
     {
         this.size = size;
         ground.localScale = new Vector3(size.x, size.y, 1f);
+        this.contentFactory = contentFactory;
 
-        
         Vector2 offset = new Vector2(
             (size.x - 1) * 0.5f, (size.y - 1) * 0.5f
         );
@@ -46,37 +97,118 @@ public class GameBoard : MonoBehaviour
                 {
                     GameTile.MakeNorthSouthNeighbors(tile, tiles[i - size.x]);
                 }
+
+
+                tile.IsAlternative = (x & 1) == 0;
+                if ((y & 1) == 0)
+                {
+                    tile.IsAlternative = !tile.IsAlternative;
+                }
+
+                tile.Content = contentFactory.Get(GameTileContentType.Empty);
             }
         
         }
 
 
         FindPaths();
+
+        ShowPaths = showPaths; 
+        ShowGrid = showGrid;
     }
 
-    void FindPaths()
+    bool FindPaths()
     {
+        int wallCount = 0;
+        int destinationCount = 0;
+
         foreach (GameTile tile in tiles)
         {
-            tile.ClearPath();
+            if (tile.Content.Type == GameTileContentType.Destination)
+            {
+                tile.BecomeDestination();
+                searchFrontier.Enqueue(tile);
+                destinationCount++;
+            }
+            else
+            {
+                tile.ClearPath();
+                if (tile.Content.Type == GameTileContentType.Wall)
+                {
+                    wallCount++;
+                }
+            }
+
         }
+
+        Debug.Log($"Starting pathfinding: {destinationCount} destinations, {wallCount} walls");
+
+        /*
         tiles[0].BecomeDestination();
         searchFrontier.Enqueue(tiles[0]);
+        */
+
+        //tiles[tiles.Length / 2].BecomeDestination();
+        //searchFrontier.Enqueue(tiles[tiles.Length / 2]);
+
+        if (searchFrontier.Count == 0)
+        {
+            return false;
+        }
+
 
         while (searchFrontier.Count > 0)
         {
             GameTile tile = searchFrontier.Dequeue();
             if (tile != null)
             {
-                searchFrontier.Enqueue(tile.GrowPathNorth());
-                searchFrontier.Enqueue(tile.GrowPathEast());
-                searchFrontier.Enqueue(tile.GrowPathSouth());
-                searchFrontier.Enqueue(tile.GrowPathWest());
+                if (tile.IsAlternative)
+                {
+                    searchFrontier.Enqueue(tile.GrowPathNorth());
+                    searchFrontier.Enqueue(tile.GrowPathSouth());
+                    searchFrontier.Enqueue(tile.GrowPathEast());
+                    searchFrontier.Enqueue(tile.GrowPathWest());
+                }
+                else
+                {
+                    searchFrontier.Enqueue(tile.GrowPathWest());
+                    searchFrontier.Enqueue(tile.GrowPathEast());
+                    searchFrontier.Enqueue(tile.GrowPathSouth());
+                    searchFrontier.Enqueue(tile.GrowPathNorth());
+                }
             }
         }
 
 
+        foreach (GameTile tile in tiles)
+        {
+            if (!tile.HasPath)
+            {
+                Debug.Log("No path");
+                return false;
+            }
+        }
+
+
+        if (showPaths)
+        {
+            Debug.Log("Showing arrows");
+            foreach (GameTile tile in tiles)
+            {
+                tile.ShowPath();
+            }
+        }
+        else
+        {
+            foreach (GameTile tile in tiles)
+            {
+                tile.HidePath();
+            }
+        }
+
+            return true;
     }
+
 
     public GameTile GetTile(Ray ray)
     {
@@ -90,6 +222,50 @@ public class GameBoard : MonoBehaviour
             }
         }
         return null;
+    }
+
+    public void ToggleDestination(GameTile tile)
+    {
+        if (tile.Content.Type == GameTileContentType.Destination)
+        {
+            tile.Content = contentFactory.Get(GameTileContentType.Empty);
+            if (!FindPaths())
+            {
+                tile.Content = contentFactory.Get(GameTileContentType.Destination);
+                FindPaths();
+            }
+        }
+        else if (tile.Content.Type == GameTileContentType.Empty)
+        {
+            tile.Content = contentFactory.Get(GameTileContentType.Destination);
+            FindPaths();
+        }
+    }
+
+    public void ToggleWall(GameTile tile)
+    {
+        if (tile.Content.Type == GameTileContentType.Wall)
+        {
+            Debug.Log("Removing wall");
+            tile.Content = contentFactory.Get(GameTileContentType.Empty);
+            FindPaths();
+        }
+        else if(tile.Content.Type == GameTileContentType.Empty) {
+            Debug.Log("Placing wall");
+            tile.Content = contentFactory.Get(GameTileContentType.Wall);
+            Debug.Log($"Wall placed, content type now: {tile.Content.Type}");
+            if (!FindPaths())
+            {
+                Debug.Log("Wall placement blocked - reverting");
+                tile.Content = contentFactory.Get(GameTileContentType.Empty);
+                Debug.Log($"Wall reverted, content type now: {tile.Content.Type}");
+                FindPaths();
+            }
+            else
+            {
+                Debug.Log("FindPaths returned true - wall kept");
+            }
+        }
     }
 
     // Start is called before the first frame update

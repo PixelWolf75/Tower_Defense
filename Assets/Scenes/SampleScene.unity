@@ -336,7 +336,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boardSize: {x: 11, y: 11}
-  tileContentFactory: {fileID: 0}
+  tileContentFactory: {fileID: 11400000, guid: 2d2686bae0bdd204c8947249b482be45, type: 2}
   board: {fileID: 1305044401}
 --- !u!4 &1080815340
 Transform:
@@ -405,8 +405,13 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8625864492708330345, guid: 807df400faad8824da93ebe96f93bfbb, type: 3}
+      propertyPath: tilePrefab
+      value: 
+      objectReference: {fileID: 1277744047301932185, guid: b3b839b996a22d44c9a569288a4ec7a0, type: 3}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 3558233668017122254, guid: 807df400faad8824da93ebe96f93bfbb, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 807df400faad8824da93ebe96f93bfbb, type: 3}

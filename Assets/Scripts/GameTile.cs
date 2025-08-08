@@ -13,6 +13,12 @@ public class GameTile : MonoBehaviour
 
     int distance;
 
+    static Quaternion
+    northRotation = Quaternion.Euler(90f, 0f, 0f),
+    eastRotation = Quaternion.Euler(90f, 90f, 0f),
+    southRotation = Quaternion.Euler(90f, 180f, 0f),
+    westRotation = Quaternion.Euler(90f, 270f, 0f);
+
     // Start is called before the first frame update
     void Start()
     {
@@ -74,7 +80,7 @@ public class GameTile : MonoBehaviour
         neighbor.distance = distance + 1;
         neighbor.nextOnPath = this;
 
-        return neighbor;
+        return neighbor.Content.Type != GameTileContentType.Wall ? neighbor : null;
     }
 
     public GameTile GrowPathNorth() => GrowPathTo(north);
@@ -84,6 +90,29 @@ public class GameTile : MonoBehaviour
     public GameTile GrowPathSouth() => GrowPathTo(south);
 
     public GameTile GrowPathWest() => GrowPathTo(west);
+
+    public bool IsAlternative { get; set; }
+
+
+    public void ShowPath()
+    {
+        if (distance == 0)
+        {
+            arrow.gameObject.SetActive(false);
+            return;
+        }
+        arrow.gameObject.SetActive(true);
+        arrow.localRotation =
+            nextOnPath == north ? northRotation :
+            nextOnPath == east ? eastRotation :
+            nextOnPath == south ? southRotation :
+            westRotation;
+    }
+
+    public void HidePath()
+    {
+        arrow.gameObject.SetActive(false);
+    }
 
 
     public GameTileContent Content

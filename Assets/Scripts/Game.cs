@@ -19,7 +19,8 @@ public class Game : MonoBehaviour
 
     void Awake()
     {
-        board.Initialize(boardSize);
+        board.Initialize(boardSize, tileContentFactory);
+        board.ShowGrid = true;
     }
 
     // Start is called before the first frame update
@@ -31,15 +32,38 @@ public class Game : MonoBehaviour
     // Update is called once per frame
     void Update () {
 		if (Input.GetMouseButtonDown(0)) {
-			HandleTouch();
+            //Debug.Log("Left Click");			
+            HandleTouch();
 		}
-	}
+        else if (Input.GetMouseButtonDown(1)) {
+            //Debug.Log("Right Click");
+			HandleAlternativeTouch();
+		}
+
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            board.ShowPaths = !board.ShowPaths;
+        }
+
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            board.ShowGrid = !board.ShowGrid;
+        }
+    }
 
 	void HandleTouch () {
 		GameTile tile = board.GetTile(TouchRay);
 		if (tile != null) {
-			tile.Content =
-				tileContentFactory.Get(GameTileContentType.Destination);
+            //tile.Content = tileContentFactory.Get(GameTileContentType.Destination);
+            Debug.Log("Toggle Wall");
+            board.ToggleWall(tile);
+        }
+	}
+
+    void HandleAlternativeTouch () {
+		GameTile tile = board.GetTile(TouchRay);
+		if (tile != null) {
+			board.ToggleDestination(tile);
 		}
 	}
 
