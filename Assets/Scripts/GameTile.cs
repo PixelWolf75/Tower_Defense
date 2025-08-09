@@ -15,6 +15,7 @@ public class GameTile : MonoBehaviour
 
     public GameTile NextTileOnPath => nextOnPath;
 
+
     static Quaternion
     northRotation = Quaternion.Euler(90f, 0f, 0f),
     eastRotation = Quaternion.Euler(90f, 90f, 0f),
@@ -82,7 +83,7 @@ public class GameTile : MonoBehaviour
         neighbor.distance = distance + 1;
         neighbor.nextOnPath = this;
 
-        return neighbor.Content.Type != GameTileContentType.Wall ? neighbor : null;
+        return neighbor.Content.BlocksPath ? null : neighbor;
     }
 
     public GameTile GrowPathNorth() => GrowPathTo(north);

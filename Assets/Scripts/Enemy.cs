@@ -4,11 +4,20 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    [SerializeField]
+    Transform model = default;
+
+
     EnemyFactory originFactory;
 
     GameTile tileFrom, tileTo;
     Vector3 positionFrom, positionTo;
     float progress;
+
+    
+    public float Scale { get; private set; }
+
+    float Health { get; set; }
 
     public EnemyFactory OriginFactory
     {
@@ -18,6 +27,14 @@ public class Enemy : MonoBehaviour
             Debug.Assert(originFactory == null, "Redefined origin factory!");
             originFactory = value;
         }
+    }
+
+    public void Initialize(float scale)
+    {
+        Scale = scale;
+        model.localScale = new Vector3(scale, scale, scale);
+
+        Health = 100f * scale;
     }
 
     // Start is called before the first frame update
@@ -44,6 +61,12 @@ public class Enemy : MonoBehaviour
 
     public bool GameUpdate()
     {
+        if (Health <= 0f)
+        {
+            OriginFactory.Reclaim(this);
+            return false;
+        }
+
         progress += Time.deltaTime;
         while (progress >= 1f)
         {
@@ -62,5 +85,11 @@ public class Enemy : MonoBehaviour
         }
         transform.localPosition = Vector3.LerpUnclamped(positionFrom, positionTo, progress);
         return true;
+    }
+
+    public void ApplyDamage(float damage)
+    {
+        Debug.Assert(damage >= 0f, "Negative damage applied.");
+        Health -= damage;
     }
 }

@@ -5,15 +5,18 @@ using UnityEngine;
 
 public enum GameTileContentType
 {
-    Empty, Destination, Wall, SpawnPoint
+    Empty, Destination, Wall, SpawnPoint, Tower
 }
 
+[SelectionBase]
 public class GameTileContent : MonoBehaviour
 {
     [SerializeField]
     GameTileContentType type = default;
 
     public GameTileContentType Type => type;
+
+    public bool BlocksPath => Type == GameTileContentType.Wall || Type == GameTileContentType.Tower;
 
     GameTileContentFactory originFactory;
 
@@ -28,6 +31,8 @@ public class GameTileContent : MonoBehaviour
     {
         
     }
+
+    public virtual void GameUpdate() { }
 
     public GameTileContentFactory OriginFactory
     {

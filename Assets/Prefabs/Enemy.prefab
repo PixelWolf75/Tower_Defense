@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 9114274359180970623}
   - component: {fileID: 6502969467917227180}
   - component: {fileID: 9028157170289305080}
-  m_Layer: 2
+  m_Layer: 6
   m_Name: Core
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -101,7 +101,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -115,7 +115,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6605967518163505802}
   - component: {fileID: 2161927199605229287}
-  m_Layer: 2
+  m_Layer: 6
   m_Name: Enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -150,6 +150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0aead8c89f6682043baed8800140e50a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  model: {fileID: 5702423956734279316}
 --- !u!1 &1775761651943631485
 GameObject:
   m_ObjectHideFlags: 0
@@ -159,7 +160,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5702423956734279316}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -194,7 +195,7 @@ GameObject:
   - component: {fileID: 6958736906698959270}
   - component: {fileID: 7262389451420503059}
   - component: {fileID: 262771092258679073}
-  m_Layer: 2
+  m_Layer: 6
   m_Name: Pole1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -283,7 +284,7 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.5000001
   m_Height: 2
@@ -301,7 +302,7 @@ GameObject:
   - component: {fileID: 7947010747077987493}
   - component: {fileID: 620355158707126324}
   - component: {fileID: 4619594364286605979}
-  m_Layer: 2
+  m_Layer: 6
   m_Name: Pole2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -390,7 +391,7 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.5000001
   m_Height: 2
@@ -405,7 +406,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 613210497935056915}
-  m_Layer: 2
+  - component: {fileID: 2894533401963372150}
+  - component: {fileID: 5356539654392518501}
+  m_Layer: 6
   m_Name: EnemyObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -431,6 +434,39 @@ Transform:
   - {fileID: 7792582384872890264}
   m_Father: {fileID: 5702423956734279316}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2894533401963372150
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8030590661901366113}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 416b9715026d2904fb4aa515e7c9969c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!135 &5356539654392518501
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8030590661901366113}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.7
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &8075892045329289226
 GameObject:
   m_ObjectHideFlags: 0
@@ -443,7 +479,7 @@ GameObject:
   - component: {fileID: 1117259197075197355}
   - component: {fileID: 3556090299452498085}
   - component: {fileID: 6195268854667281138}
-  m_Layer: 2
+  m_Layer: 6
   m_Name: Pole3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -532,7 +568,7 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.5000001
   m_Height: 2

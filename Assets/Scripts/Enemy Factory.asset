@@ -13,3 +13,6 @@ MonoBehaviour:
   m_Name: Enemy Factory
   m_EditorClassIdentifier: 
   prefab: {fileID: 2161927199605229287, guid: db61b819e74b2f046b67064b80099a83, type: 3}
+  scale:
+    min: 0.5
+    max: 1.0070697
