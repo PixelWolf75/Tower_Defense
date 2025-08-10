@@ -2,7 +2,7 @@
 - Project name: Tower_Defense
 - Unity version: Unity 2023.1.11f1
 - Active game object:
-  - Name: Tower
+  - Name: Enemy
   - Tag: Untagged
-  - Layer: Default
+  - Layer: Enemy
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->

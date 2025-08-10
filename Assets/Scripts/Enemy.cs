@@ -2,7 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+public enum EnemyType
+{
+    Small, Medium, Large
+}
+
+public class Enemy : GameBehaviour
 {
     [SerializeField]
     Transform model = default;
@@ -29,12 +34,12 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    public void Initialize(float scale)
+    public void Initialize(float scale, float health)
     {
         Scale = scale;
         model.localScale = new Vector3(scale, scale, scale);
 
-        Health = 100f * scale;
+        Health = health;
     }
 
     // Start is called before the first frame update
@@ -59,11 +64,12 @@ public class Enemy : MonoBehaviour
         progress = 0f;
     }
 
-    public bool GameUpdate()
+    public override bool GameUpdate()
     {
         if (Health <= 0f)
         {
-            OriginFactory.Reclaim(this);
+            Game.EnemyReachedDestination();
+            Recycle();
             return false;
         }
 
@@ -75,7 +81,7 @@ public class Enemy : MonoBehaviour
 
             if (tileTo == null)
             {
-                OriginFactory.Reclaim(this);
+                Recycle();
                 return false;
             }
 
@@ -91,5 +97,10 @@ public class Enemy : MonoBehaviour
     {
         Debug.Assert(damage >= 0f, "Negative damage applied.");
         Health -= damage;
+    }
+
+    public override void Recycle()
+    {
+        OriginFactory.Reclaim(this);
     }
 }

@@ -6,31 +6,53 @@ using UnityEngine;
 public class Game : MonoBehaviour
 {
 
+    static Game instance;
+
     [SerializeField]
     Vector2Int boardSize = new Vector2Int(11, 11); //Set as default as 11x11
 
     [SerializeField]
 	GameTileContentFactory tileContentFactory = default;
 
-    [SerializeField]
-    EnemyFactory enemyFactory = default;
+    //[SerializeField]
+    //EnemyFactory enemyFactory = default;
 
     [SerializeField]
     GameBoard board = default;
 
-    [SerializeField, Range(0.1f, 10f)]
-    float spawnSpeed = 1f;
-    
-    float spawnProgress;
+    //[SerializeField, Range(0.1f, 10f)]
+    //float spawnSpeed = 1f;
 
-    EnemyCollection enemies = new EnemyCollection();
+    [SerializeField, Range(0, 100)]
+    int startingPlayerHealth = 10;
+
+    [SerializeField]
+    GameScenario scenario = default;
+
+    [SerializeField, Range(1f, 10f)]
+    float playSpeed = 1f;
+
+    GameScenario.State activeScenario;
+
+    //float spawnProgress;
+
+    int playerHealth;
+
+    const float pausedTimeScale = 0f;
+
+    GameBehaviourCollection enemies = new GameBehaviourCollection();
 
     Ray TouchRay => Camera.main.ScreenPointToRay(Input.mousePosition);
 
     void Awake()
     {
+        instance = this;
+
+        playerHealth = startingPlayerHealth;
+
         board.Initialize(boardSize, tileContentFactory);
         board.ShowGrid = true;
+        activeScenario = scenario.Begin();
     }
 
     // Start is called before the first frame update
@@ -60,11 +82,46 @@ public class Game : MonoBehaviour
             board.ShowGrid = !board.ShowGrid;
         }
 
+        /*
         spawnProgress += spawnSpeed * Time.deltaTime;
         while (spawnProgress >= 1f)
         {
             spawnProgress -= 1f;
             SpawnEnemy();
+        }
+        */
+
+        if (playerHealth <= 0 && startingPlayerHealth > 0)
+        {
+            Debug.Log("Defeat!");
+            BeginNewGame();
+            
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Time.timeScale =
+                Time.timeScale > pausedTimeScale ? pausedTimeScale : 1f;
+        }
+        else if (Time.timeScale > pausedTimeScale)
+        {
+            Time.timeScale = playSpeed;
+        }
+
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            BeginNewGame();
+        }
+
+        // Only progress scenario if spawn points exist
+        if (board.SpawnPointCount > 0)
+        {
+            if (!activeScenario.Progress() && enemies.IsEmpty)
+            {
+                Debug.Log("Victory!");
+                BeginNewGame();
+                activeScenario.Progress();
+            }
         }
 
         enemies.GameUpdate();
@@ -72,19 +129,26 @@ public class Game : MonoBehaviour
         board.GameUpdate();
     }
 
-    void SpawnEnemy()
+    public static void SpawnEnemy(EnemyFactory factory, EnemyType type)
     {
-        if (board.SpawnPointCount == 0)
+        //Debug.Log($"SpawnEnemy called: factory={factory.name}, type={type}");
+        if (instance.board.SpawnPointCount == 0)
         {
             return; // Don't spawn if no spawn points exist
         }
 
         GameTile spawnPoint =
-            board.GetSpawnPoint(Random.Range(0, board.SpawnPointCount));
-        Enemy enemy = enemyFactory.Get();
+            instance.board.GetSpawnPoint(Random.Range(0, instance.board.SpawnPointCount));
+        Enemy enemy = factory.Get(type);
+        //Debug.Log($"Spawning at tile: {spawnPoint.transform.position}");
         enemy.SpawnOn(spawnPoint);
 
-        enemies.Add(enemy);
+        instance.enemies.Add(enemy);
+    }
+
+    public static void EnemyReachedDestination()
+    {
+        instance.playerHealth -= 1;
     }
 
     void HandleTouch () {
@@ -101,6 +165,15 @@ public class Game : MonoBehaviour
             }
         }
 	}
+
+    void BeginNewGame()
+    {
+        playerHealth = startingPlayerHealth;
+        enemies.Clear();
+        //nonEnemies.Clear();
+        board.Clear();
+        activeScenario = scenario.Begin();
+    }
 
     void HandleAlternativeTouch () {
 		GameTile tile = board.GetTile(TouchRay);
