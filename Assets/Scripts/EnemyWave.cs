@@ -28,7 +28,7 @@ public class EnemyWave : ScriptableObject
         {
             this.wave = wave;
             index = 0;
-            Debug.Assert(wave.spawnSequences.Length > 0, "Empty wave!");
+            //Debug.Assert(wave.spawnSequences.Length > 0, "Empty wave!");
             sequence = wave.spawnSequences[0].Begin();
         }
 

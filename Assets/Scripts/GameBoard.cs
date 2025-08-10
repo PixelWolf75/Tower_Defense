@@ -132,8 +132,11 @@ public class GameBoard : MonoBehaviour
         }
         spawnPoints.Clear();
         updatingContent.Clear();
-        ToggleDestination(tiles[tiles.Length / 2]);
-        ToggleSpawnPoint(tiles[0]);
+        if (tiles != null && tiles.Length > 0)
+        {
+            ToggleDestination(tiles[tiles.Length / 2]);
+            ToggleSpawnPoint(tiles[0]);
+        }
     }
 
     public void GameUpdate()

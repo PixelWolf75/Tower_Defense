@@ -33,7 +33,7 @@ public class EnemySpawnSequence
         {
             this.sequence = sequence;
             count = 0;
-            cooldown = sequence.cooldown;
+            cooldown = 0f;//sequence.cooldown;
         }
 
         public float Progress(float deltaTime)
@@ -48,7 +48,7 @@ public class EnemySpawnSequence
                     return cooldown;
                 }
                 count += 1;
-                Debug.Log($"Spawning enemy #{count}");
+                //Debug.Log($"Spawning enemy #{count}");
                 Game.SpawnEnemy(sequence.factory, sequence.type);
             }
 

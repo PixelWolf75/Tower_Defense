@@ -34,6 +34,9 @@ public class Game : MonoBehaviour
 
     GameScenario.State activeScenario;
 
+    [SerializeField]
+    HealthBar healthBar = default;
+
     //float spawnProgress;
 
     int playerHealth;
@@ -49,6 +52,15 @@ public class Game : MonoBehaviour
         instance = this;
 
         playerHealth = startingPlayerHealth;
+
+
+        // Debug asset setup
+        if (scenario == null)
+        {
+            Debug.LogError("No GameScenario assigned!");
+            return;
+        }
+    
 
         board.Initialize(boardSize, tileContentFactory);
         board.ShowGrid = true;
@@ -149,6 +161,7 @@ public class Game : MonoBehaviour
     public static void EnemyReachedDestination()
     {
         instance.playerHealth -= 1;
+        instance.healthBar.ReduceHealth(1); // Update the UI
     }
 
     void HandleTouch () {
@@ -169,6 +182,7 @@ public class Game : MonoBehaviour
     void BeginNewGame()
     {
         playerHealth = startingPlayerHealth;
+        healthBar.ResetHealth(startingPlayerHealth); // Reset UI
         enemies.Clear();
         //nonEnemies.Clear();
         board.Clear();

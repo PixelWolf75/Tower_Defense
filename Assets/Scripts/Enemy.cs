@@ -68,7 +68,6 @@ public class Enemy : GameBehaviour
     {
         if (Health <= 0f)
         {
-            Game.EnemyReachedDestination();
             Recycle();
             return false;
         }
@@ -81,6 +80,7 @@ public class Enemy : GameBehaviour
 
             if (tileTo == null)
             {
+                Game.EnemyReachedDestination();
                 Recycle();
                 return false;
             }
