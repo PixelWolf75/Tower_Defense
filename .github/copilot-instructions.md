@@ -2,7 +2,7 @@
 - Project name: Tower_Defense
 - Unity version: Unity 2023.1.11f1
 - Active game object:
-  - Name: Health Bar
+  - Name: Canvas
   - Tag: Untagged
   - Layer: UI
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->
