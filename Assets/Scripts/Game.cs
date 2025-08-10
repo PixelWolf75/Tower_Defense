@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using TMPro;
 
 public class Game : MonoBehaviour
 {
@@ -13,6 +13,12 @@ public class Game : MonoBehaviour
 
     [SerializeField]
 	GameTileContentFactory tileContentFactory = default;
+
+    [SerializeField]
+    TextMeshProUGUI gameOverText = default;
+
+    [SerializeField]
+    TextMeshProUGUI gameClearText = default;
 
     //[SerializeField]
     //EnemyFactory enemyFactory = default;
@@ -41,6 +47,8 @@ public class Game : MonoBehaviour
 
     int playerHealth;
 
+    int currency;
+
     const float pausedTimeScale = 0f;
 
     GameBehaviourCollection enemies = new GameBehaviourCollection();
@@ -52,6 +60,7 @@ public class Game : MonoBehaviour
         instance = this;
 
         playerHealth = startingPlayerHealth;
+        currency = 0;
 
 
         // Debug asset setup
@@ -106,8 +115,8 @@ public class Game : MonoBehaviour
         if (playerHealth <= 0 && startingPlayerHealth > 0)
         {
             Debug.Log("Defeat!");
+            GameOver();
             BeginNewGame();
-            
         }
 
         if (Input.GetKeyDown(KeyCode.Space))
@@ -131,6 +140,7 @@ public class Game : MonoBehaviour
             if (!activeScenario.Progress() && enemies.IsEmpty)
             {
                 Debug.Log("Victory!");
+                GameClear();
                 BeginNewGame();
                 activeScenario.Progress();
             }
@@ -162,6 +172,11 @@ public class Game : MonoBehaviour
     {
         instance.playerHealth -= 1;
         instance.healthBar.ReduceHealth(1); // Update the UI
+    }
+
+    public static void EnemyHasBeenKilled()
+    {
+        instance.currency += 1;
     }
 
     void HandleTouch () {
@@ -217,5 +232,17 @@ public class Game : MonoBehaviour
         }
     }
 
-    
+    void GameOver()
+    {
+        Time.timeScale =
+                Time.timeScale > pausedTimeScale ? pausedTimeScale : 1f;
+        gameOverText.gameObject.SetActive(true);
+    }
+
+    void GameClear()
+    {
+        Time.timeScale =
+                Time.timeScale > pausedTimeScale ? pausedTimeScale : 1f;
+        gameClearText.gameObject.SetActive(true);
+    }
 }

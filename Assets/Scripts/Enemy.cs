@@ -101,6 +101,7 @@ public class Enemy : GameBehaviour
 
     public override void Recycle()
     {
+        Game.EnemyHasBeenKilled();
         OriginFactory.Reclaim(this);
     }
 }
