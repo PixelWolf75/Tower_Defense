@@ -2274,7 +2274,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1367814526}
   m_Layer: 5
-  m_Name: Tile Options
+  m_Name: Title Options
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

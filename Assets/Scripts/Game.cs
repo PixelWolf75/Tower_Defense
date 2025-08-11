@@ -29,6 +29,9 @@ public class Game : MonoBehaviour
     [SerializeField]
     TextMeshProUGUI scoreText = default;
 
+    [SerializeField]
+    GameObject NewGamePanel = default;
+
     //[SerializeField]
     //EnemyFactory enemyFactory = default;
 
@@ -63,6 +66,8 @@ public class Game : MonoBehaviour
     int numTowers;
     int numWalls;
 
+    bool isGameOverOrCleared;
+
     const float pausedTimeScale = 0f;
 
     GameBehaviourCollection enemies = new GameBehaviourCollection();
@@ -78,6 +83,7 @@ public class Game : MonoBehaviour
         score = 0;
         numTowers = 20;
         numWalls = 20;
+        isGameOverOrCleared = false;
 
         UpdateUI();
 
@@ -130,43 +136,46 @@ public class Game : MonoBehaviour
         }
         */
 
-        if (playerHealth <= 0 && startingPlayerHealth > 0)
+        if (!isGameOverOrCleared)
         {
-            Debug.Log("Defeat!");
-            GameOver();
-            BeginNewGame();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Time.timeScale =
-                Time.timeScale > pausedTimeScale ? pausedTimeScale : 1f;
-        }
-        else if (Time.timeScale > pausedTimeScale)
-        {
-            Time.timeScale = playSpeed;
-        }
-
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            BeginNewGame();
-        }
-
-        // Only progress scenario if spawn points exist
-        if (board.SpawnPointCount > 0)
-        {
-            if (!activeScenario.Progress() && enemies.IsEmpty)
+            if (playerHealth <= 0 && startingPlayerHealth > 0)
             {
-                Debug.Log("Victory!");
-                GameClear();
-                BeginNewGame();
-                activeScenario.Progress();
+                Debug.Log("Defeat!");
+                GameOver();
+                //BeginNewGame();
             }
-        }
 
-        enemies.GameUpdate();
-        Physics.SyncTransforms();
-        board.GameUpdate();
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                Time.timeScale =
+                    Time.timeScale > pausedTimeScale ? pausedTimeScale : 1f;
+            }
+            else if (Time.timeScale > pausedTimeScale)
+            {
+                Time.timeScale = playSpeed;
+            }
+
+            if (Input.GetKeyDown(KeyCode.B))
+            {
+                BeginNewGame();
+            }
+
+            // Only progress scenario if spawn points exist
+            if (board.SpawnPointCount > 0)
+            {
+                if (!activeScenario.Progress() && enemies.IsEmpty)
+                {
+                    Debug.Log("Victory!");
+                    GameClear();
+                    //BeginNewGame();
+                    activeScenario.Progress();
+                }
+            }
+
+            enemies.GameUpdate();
+            Physics.SyncTransforms();
+            board.GameUpdate();
+        }
     }
 
     public static void SpawnEnemy(EnemyFactory factory, EnemyType type)
@@ -239,8 +248,15 @@ public class Game : MonoBehaviour
         numWallsText.text = numWalls.ToString();
     }
 
-    void BeginNewGame()
+    public void BeginNewGame()
     {
+        Time.timeScale = 1f;
+        NewGamePanel.SetActive(!NewGamePanel.activeSelf);
+        gameOverText.SetActive(false);
+        gameClearText.SetActive(false);
+
+        isGameOverOrCleared = false;
+
         playerHealth = startingPlayerHealth;
         healthBar.ResetHealth(startingPlayerHealth); // Reset UI
         enemies.Clear();
@@ -285,15 +301,19 @@ public class Game : MonoBehaviour
 
     void GameOver()
     {
-        Time.timeScale =
-                Time.timeScale > pausedTimeScale ? pausedTimeScale : 1f;
+        isGameOverOrCleared = true;
+        Time.timeScale = 0f; // Freeze time once
         gameOverText.SetActive(true);
+        Debug.Log("NewGamePanel is set to Active");
+        NewGamePanel.SetActive(true);
     }
 
     void GameClear()
     {
-        Time.timeScale =
-                Time.timeScale > pausedTimeScale ? pausedTimeScale : 1f;
+        isGameOverOrCleared = true;
+        Time.timeScale = 0f; // Freeze time once
         gameClearText.SetActive(true);
+        Debug.Log("NewGamePanel is set to Active");
+        NewGamePanel.SetActive(true);
     }
 }

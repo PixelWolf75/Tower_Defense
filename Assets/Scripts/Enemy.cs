@@ -117,7 +117,7 @@ public class Enemy : GameBehaviour
             {
                 healthBarManager.ShowHealthBar(false);
             }
-
+            Game.EnemyHasBeenKilled();
             Recycle();
             return false;
         }
@@ -168,7 +168,6 @@ public class Enemy : GameBehaviour
             healthBarManager.ShowHealthBar(false);
         }
 
-        Game.EnemyHasBeenKilled();
         OriginFactory.Reclaim(this);
     }
 }
