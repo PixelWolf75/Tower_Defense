@@ -62,7 +62,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 03ec320dec3eb2441af856119cc616a6, type: 2}
+  - {fileID: 2100000, guid: 65eb1fa5119a44b4886235155ec98aa1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -169,7 +169,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 03ec320dec3eb2441af856119cc616a6, type: 2}
+  - {fileID: 2100000, guid: 65eb1fa5119a44b4886235155ec98aa1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -273,7 +273,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: b4d483d8cef23f84bab6088f3d921826, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -347,6 +347,7 @@ MonoBehaviour:
   targetingRange: 1.5
   turret: {fileID: 6943597685376065813}
   laserBeam: {fileID: 5060702488929967414}
+  damagePerSecond: 10
 --- !u!1 &7481259111573939793
 GameObject:
   m_ObjectHideFlags: 0

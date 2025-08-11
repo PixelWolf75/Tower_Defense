@@ -12,6 +12,8 @@ public class Enemy : GameBehaviour
     [SerializeField]
     Transform model = default;
 
+    [SerializeField]
+    Blink blinker = default;
 
     EnemyFactory originFactory;
 
@@ -19,6 +21,7 @@ public class Enemy : GameBehaviour
     Vector3 positionFrom, positionTo;
     float progress;
 
+    private bool bIsBlinking = false;
     
     public float Scale { get; private set; }
 
@@ -66,8 +69,21 @@ public class Enemy : GameBehaviour
 
     public override bool GameUpdate()
     {
+        if(Health <= 50f && !bIsBlinking)
+        {
+            //Debug.Log("Start blinking");
+            blinker.StartBlinking();
+            bIsBlinking = true;
+        }
+
+        if(Health <= 10f)
+        {
+            blinker.SetBlinkInterval(0.01f);
+        }
+
         if (Health <= 0f)
         {
+            blinker.CancelBlinking();
             Recycle();
             return false;
         }

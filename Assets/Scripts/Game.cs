@@ -15,10 +15,10 @@ public class Game : MonoBehaviour
 	GameTileContentFactory tileContentFactory = default;
 
     [SerializeField]
-    TextMeshProUGUI gameOverText = default;
+    GameObject gameOverText = default;
 
     [SerializeField]
-    TextMeshProUGUI gameClearText = default;
+    GameObject gameClearText = default;
 
     //[SerializeField]
     //EnemyFactory enemyFactory = default;
@@ -236,13 +236,13 @@ public class Game : MonoBehaviour
     {
         Time.timeScale =
                 Time.timeScale > pausedTimeScale ? pausedTimeScale : 1f;
-        gameOverText.gameObject.SetActive(true);
+        gameOverText.SetActive(true);
     }
 
     void GameClear()
     {
         Time.timeScale =
                 Time.timeScale > pausedTimeScale ? pausedTimeScale : 1f;
-        gameClearText.gameObject.SetActive(true);
+        gameClearText.SetActive(true);
     }
 }
