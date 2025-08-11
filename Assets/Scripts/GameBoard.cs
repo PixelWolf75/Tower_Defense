@@ -259,7 +259,7 @@ public class GameBoard : MonoBehaviour
         return spawnPoints[index];
     }
 
-    public void ToggleDestination(GameTile tile)
+    public bool ToggleDestination(GameTile tile)
     {
         if (tile.Content.Type == GameTileContentType.Destination)
         {
@@ -268,48 +268,59 @@ public class GameBoard : MonoBehaviour
             {
                 tile.Content = contentFactory.Get(GameTileContentType.Destination);
                 FindPaths();
+                return true;
             }
+            return false;
         }
         else if (tile.Content.Type == GameTileContentType.Empty)
         {
             tile.Content = contentFactory.Get(GameTileContentType.Destination);
             FindPaths();
+            return true;
         }
+
+        return false;
     }
 
-    public void ToggleWall(GameTile tile)
+    public bool ToggleWall(GameTile tile)
     {
         if (tile.Content.Type == GameTileContentType.Wall)
         {
-            Debug.Log("Removing wall");
+            //Debug.Log("Removing wall");
             tile.Content = contentFactory.Get(GameTileContentType.Empty);
             FindPaths();
+            return false;
         }
         else if(tile.Content.Type == GameTileContentType.Empty) {
-            Debug.Log("Placing wall");
+            //Debug.Log("Placing wall");
             tile.Content = contentFactory.Get(GameTileContentType.Wall);
-            Debug.Log($"Wall placed, content type now: {tile.Content.Type}");
+            //Debug.Log($"Wall placed, content type now: {tile.Content.Type}");
             if (!FindPaths())
             {
                 Debug.Log("Wall placement blocked - reverting");
                 tile.Content = contentFactory.Get(GameTileContentType.Empty);
-                Debug.Log($"Wall reverted, content type now: {tile.Content.Type}");
+                //Debug.Log($"Wall reverted, content type now: {tile.Content.Type}");
                 FindPaths();
+                return false;
             }
             else
             {
-                Debug.Log("FindPaths returned true - wall kept");
+                //Debug.Log("FindPaths returned true - wall kept");
             }
+            return true;
         }
+
+        return false;
     }
 
-    public void ToggleTower(GameTile tile)
+    public bool ToggleTower(GameTile tile)
     {
         if (tile.Content.Type == GameTileContentType.Tower)
         {
             updatingContent.Remove(tile.Content);
             tile.Content = contentFactory.Get(GameTileContentType.Empty);
             FindPaths();
+            return false;
         }
         else if (tile.Content.Type == GameTileContentType.Empty)
         {
@@ -322,16 +333,21 @@ public class GameBoard : MonoBehaviour
             {
                 tile.Content = contentFactory.Get(GameTileContentType.Empty);
                 FindPaths();
+                return false;
             }
+            return true;
         }
         else if (tile.Content.Type == GameTileContentType.Wall)
         {
             tile.Content = contentFactory.Get(GameTileContentType.Tower);
             updatingContent.Add(tile.Content);
+            return true;
         }
+
+        return false;
     }
 
-    public void ToggleSpawnPoint(GameTile tile)
+    public bool ToggleSpawnPoint(GameTile tile)
     {
         if (tile.Content.Type == GameTileContentType.SpawnPoint)
         {
@@ -339,13 +355,18 @@ public class GameBoard : MonoBehaviour
             {
                 spawnPoints.Remove(tile);
                 tile.Content = contentFactory.Get(GameTileContentType.Empty);
+                return false;
             }
+            return true;
         }
         else if (tile.Content.Type == GameTileContentType.Empty)
         {
             tile.Content = contentFactory.Get(GameTileContentType.SpawnPoint);
             spawnPoints.Add(tile);
+            return true;
         }
+
+        return false;
     }
 
     // Start is called before the first frame update

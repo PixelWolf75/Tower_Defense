@@ -15,6 +15,8 @@ public class Enemy : GameBehaviour
     [SerializeField]
     Blink blinker = default;
 
+    private EnemyHealthBarManager healthBarManager;
+
     EnemyFactory originFactory;
 
     GameTile tileFrom, tileTo;
@@ -26,6 +28,7 @@ public class Enemy : GameBehaviour
     public float Scale { get; private set; }
 
     float Health { get; set; }
+    float MaxHealth { get; set; } // Added to track max health
 
     public EnemyFactory OriginFactory
     {
@@ -37,12 +40,25 @@ public class Enemy : GameBehaviour
         }
     }
 
+    void Awake()
+    {
+        // Get the health bar manager component
+        healthBarManager = GetComponent<EnemyHealthBarManager>();
+    }
+
     public void Initialize(float scale, float health)
     {
         Scale = scale;
         model.localScale = new Vector3(scale, scale, scale);
 
         Health = health;
+        MaxHealth = health;
+
+        // Update health bar if available
+        if (healthBarManager != null)
+        {
+            healthBarManager.UpdateHealth(Health, MaxHealth);
+        }
     }
 
     // Start is called before the first frame update
@@ -65,6 +81,17 @@ public class Enemy : GameBehaviour
         positionFrom = tileFrom.transform.localPosition;
         positionTo = tileTo.transform.localPosition;
         progress = 0f;
+
+        // Show health bar when spawned
+        if (healthBarManager != null)
+        {
+            Debug.Log($"[{gameObject.name}] Found healthBarManager, calling ShowHealthBar(true)");
+            healthBarManager.ShowHealthBar(true);
+        }
+        else
+        {
+            Debug.LogError($"[{gameObject.name}] healthBarManager is null in SpawnOn!");
+        }
     }
 
     public override bool GameUpdate()
@@ -84,6 +111,13 @@ public class Enemy : GameBehaviour
         if (Health <= 0f)
         {
             blinker.CancelBlinking();
+
+            // Hide health bar before recycling
+            if (healthBarManager != null)
+            {
+                healthBarManager.ShowHealthBar(false);
+            }
+
             Recycle();
             return false;
         }
@@ -96,7 +130,14 @@ public class Enemy : GameBehaviour
 
             if (tileTo == null)
             {
+                // Hide health bar when reaching destination
+                if (healthBarManager != null)
+                {
+                    healthBarManager.ShowHealthBar(false);
+                }
+
                 Game.EnemyReachedDestination();
+
                 Recycle();
                 return false;
             }
@@ -113,10 +154,20 @@ public class Enemy : GameBehaviour
     {
         Debug.Assert(damage >= 0f, "Negative damage applied.");
         Health -= damage;
+
+        if (healthBarManager != null)
+        {
+            healthBarManager.UpdateHealth(Health, MaxHealth);
+        }
     }
 
     public override void Recycle()
     {
+        if (healthBarManager != null)
+        {
+            healthBarManager.ShowHealthBar(false);
+        }
+
         Game.EnemyHasBeenKilled();
         OriginFactory.Reclaim(this);
     }

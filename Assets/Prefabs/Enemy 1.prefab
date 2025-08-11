@@ -115,6 +115,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6605967518163505802}
   - component: {fileID: 2161927199605229287}
+  - component: {fileID: 785744390099078757}
   m_Layer: 6
   m_Name: Enemy 1
   m_TagString: Untagged
@@ -152,6 +153,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   model: {fileID: 5702423956734279316}
   blinker: {fileID: 342407097413815184}
+--- !u!114 &785744390099078757
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 768440134458996716}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2c6c20d43abe8a44ab910cd36488078, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthBarPrefab: {fileID: 5570939952723652107, guid: 8656a25994c90b441860537f2a76c709, type: 3}
+  healthBarOffset: {x: 0, y: 1, z: 0}
 --- !u!1 &1425184621602899961
 GameObject:
   m_ObjectHideFlags: 0

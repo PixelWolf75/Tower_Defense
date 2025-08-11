@@ -20,6 +20,15 @@ public class Game : MonoBehaviour
     [SerializeField]
     GameObject gameClearText = default;
 
+    [SerializeField]
+    TextMeshProUGUI numTowersText = default;
+
+    [SerializeField]
+    TextMeshProUGUI numWallsText = default;
+
+    [SerializeField]
+    TextMeshProUGUI scoreText = default;
+
     //[SerializeField]
     //EnemyFactory enemyFactory = default;
 
@@ -49,6 +58,11 @@ public class Game : MonoBehaviour
 
     int currency;
 
+    int score;
+
+    int numTowers;
+    int numWalls;
+
     const float pausedTimeScale = 0f;
 
     GameBehaviourCollection enemies = new GameBehaviourCollection();
@@ -61,7 +75,11 @@ public class Game : MonoBehaviour
 
         playerHealth = startingPlayerHealth;
         currency = 0;
+        score = 0;
+        numTowers = 20;
+        numWalls = 20;
 
+        UpdateUI();
 
         // Debug asset setup
         if (scenario == null)
@@ -177,6 +195,11 @@ public class Game : MonoBehaviour
     public static void EnemyHasBeenKilled()
     {
         instance.currency += 1;
+        instance.score += 1;
+        instance.numWalls += 1;
+        instance.numTowers += 1;
+
+        instance.UpdateUI();
     }
 
     void HandleTouch () {
@@ -185,14 +208,36 @@ public class Game : MonoBehaviour
             //tile.Content = tileContentFactory.Get(GameTileContentType.Destination);
             if (Input.GetKey(KeyCode.LeftShift))
             {
-                board.ToggleTower(tile);
+                if (numTowers > 0)
+                {
+                    if(board.ToggleTower(tile))
+                    {
+                        numTowers--;
+                    }
+                }
+                
             }
             else
             {
-                board.ToggleWall(tile);
+                if (numWalls > 0)
+                {
+                    if(board.ToggleWall(tile))
+                    {
+                        numWalls--;
+                    }
+                }
             }
+
+            UpdateUI();
         }
 	}
+
+    void UpdateUI()
+    {
+        scoreText.text = score.ToString();
+        numTowersText.text = numTowers.ToString();
+        numWallsText.text = numWalls.ToString();
+    }
 
     void BeginNewGame()
     {
@@ -201,6 +246,12 @@ public class Game : MonoBehaviour
         enemies.Clear();
         //nonEnemies.Clear();
         board.Clear();
+        
+        score = 0;
+        numTowers = 0;
+        numWalls = 0;
+        UpdateUI();
+
         activeScenario = scenario.Begin();
     }
 
