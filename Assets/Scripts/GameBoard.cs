@@ -16,6 +16,9 @@ public class GameBoard : MonoBehaviour
     Vector2Int size;
     GameTile[] tiles;
 
+    int totalSpawnPoints;
+    int totalDestinations;
+
     List<GameTile> spawnPoints = new List<GameTile>();
 
     Queue<GameTile> searchFrontier = new Queue<GameTile>();
@@ -72,11 +75,14 @@ public class GameBoard : MonoBehaviour
 
     public int SpawnPointCount => spawnPoints.Count;
 
-    public void Initialize(Vector2Int size, GameTileContentFactory contentFactory)
+    public void Initialize(Vector2Int size, GameTileContentFactory contentFactory, int numSpawnPoints, int numDestinations)
     {
         this.size = size;
         ground.localScale = new Vector3(size.x, size.y, 1f);
         this.contentFactory = contentFactory;
+
+        this.totalSpawnPoints = numSpawnPoints;
+        this.totalDestinations = numDestinations;
 
         Vector2 offset = new Vector2(
             (size.x - 1) * 0.5f, (size.y - 1) * 0.5f
@@ -134,10 +140,51 @@ public class GameBoard : MonoBehaviour
         updatingContent.Clear();
         if (tiles != null && tiles.Length > 0)
         {
-            ToggleDestination(tiles[tiles.Length / 2]);
-            ToggleSpawnPoint(tiles[0]);
+            if (totalDestinations + totalSpawnPoints < tiles.Length)
+            {
+
+                // Create the pool
+                List<int> randNumPool = new List<int>();
+                for (int i = 0; i < tiles.Length; i++)
+                {
+                    randNumPool.Add(i);
+                }
+
+                List<int> destIndexes = new List<int>();
+                List<int> spawnIndexes = new List<int>();
+
+                // Fill destIndexes
+                for (int i = 0; i < totalDestinations; i++)
+                {
+                    int index = Random.Range(0, randNumPool.Count);
+                    destIndexes.Add(randNumPool[index]);
+                    randNumPool.RemoveAt(index); // remove so it can’t be reused
+                }
+
+                // Fill spawnIndexes
+                for (int i = 0; i < totalSpawnPoints; i++)
+                {
+                    int index = Random.Range(0, randNumPool.Count);
+                    spawnIndexes.Add(randNumPool[index]);
+                    randNumPool.RemoveAt(index);
+                }
+
+                //ToggleDestination(tiles[tiles.Length / 2]);
+                //ToggleSpawnPoint(tiles[0]);
+
+                foreach (int index in spawnIndexes)
+                {
+                    ToggleSpawnPoint(tiles[index]);
+                }
+
+                foreach (int index in destIndexes)
+                {
+                    ToggleDestination(tiles[index]);
+                }
+            }
         }
     }
+
 
     public void GameUpdate()
     {

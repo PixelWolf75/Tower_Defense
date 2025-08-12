@@ -2,7 +2,7 @@
 - Project name: Tower_Defense
 - Unity version: Unity 2023.1.11f1
 - Active game object:
-  - Name: Game Over Bar
+  - Name: Game
   - Tag: Untagged
-  - Layer: UI
+  - Layer: Default
 <!-- UNITY CODE ASSIST INSTRUCTIONS END -->

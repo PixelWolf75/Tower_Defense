@@ -11,6 +11,12 @@ public class Game : MonoBehaviour
     [SerializeField]
     Vector2Int boardSize = new Vector2Int(11, 11); //Set as default as 11x11
 
+    [SerializeField, Min(1)]
+    int numDestinations = 1;
+
+    [SerializeField, Min(1)]
+    int numSpawnPoints = 1;
+
     [SerializeField]
 	GameTileContentFactory tileContentFactory = default;
 
@@ -81,8 +87,8 @@ public class Game : MonoBehaviour
         playerHealth = startingPlayerHealth;
         currency = 0;
         score = 0;
-        numTowers = 20;
-        numWalls = 20;
+        numTowers = 15;
+        numWalls = 15;
         isGameOverOrCleared = false;
 
         UpdateUI();
@@ -95,7 +101,7 @@ public class Game : MonoBehaviour
         }
     
 
-        board.Initialize(boardSize, tileContentFactory);
+        board.Initialize(boardSize, tileContentFactory, numSpawnPoints, numDestinations);
         board.ShowGrid = true;
         activeScenario = scenario.Begin();
     }
@@ -264,8 +270,8 @@ public class Game : MonoBehaviour
         board.Clear();
         
         score = 0;
-        numTowers = 0;
-        numWalls = 0;
+        numTowers = 15;
+        numWalls = 15;
         UpdateUI();
 
         activeScenario = scenario.Begin();

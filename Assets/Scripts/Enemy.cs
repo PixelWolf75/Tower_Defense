@@ -26,6 +26,7 @@ public class Enemy : GameBehaviour
     private bool bIsBlinking = false;
     
     public float Scale { get; private set; }
+    private float maxScale;
 
     float Health { get; set; }
     float MaxHealth { get; set; } // Added to track max health
@@ -49,6 +50,7 @@ public class Enemy : GameBehaviour
     public void Initialize(float scale, float health)
     {
         Scale = scale;
+        maxScale = Scale;
         model.localScale = new Vector3(scale, scale, scale);
 
         Health = health;
@@ -155,10 +157,19 @@ public class Enemy : GameBehaviour
         Debug.Assert(damage >= 0f, "Negative damage applied.");
         Health -= damage;
 
+        Shrink();
+
         if (healthBarManager != null)
         {
             healthBarManager.UpdateHealth(Health, MaxHealth);
         }
+    }
+
+    void Shrink()
+    {
+        Scale = maxScale * (Health / MaxHealth);
+        Debug.Log(Scale);
+        model.localScale = new Vector3(Scale, Scale, Scale);
     }
 
     public override void Recycle()
