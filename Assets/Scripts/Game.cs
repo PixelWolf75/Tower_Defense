@@ -73,6 +73,7 @@ public class Game : MonoBehaviour
     int numWalls;
 
     bool isGameOverOrCleared;
+    bool isInitialized = false; // Track if game is properly initialized
 
     const float pausedTimeScale = 0f;
 
@@ -84,6 +85,7 @@ public class Game : MonoBehaviour
     {
         instance = this;
 
+        /*
         playerHealth = startingPlayerHealth;
         currency = 0;
         score = 0;
@@ -104,17 +106,45 @@ public class Game : MonoBehaviour
         board.Initialize(boardSize, tileContentFactory, numSpawnPoints, numDestinations);
         board.ShowGrid = true;
         activeScenario = scenario.Begin();
+        */
+
+        Debug.Log("Game Awake - Initializing scene");
+        InitializeGame();
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        // Additional initialization in Start to ensure everything is ready
+        if (!isInitialized)
+        {
+            Debug.LogWarning("Game not initialized in Awake, initializing in Start");
+            InitializeGame();
+        }
+
+        // Force scenario to start fresh
+        ResetScenario();
+    }
+
+    void ResetScenario()
+    {
+        if (scenario != null)
+        {
+            activeScenario = scenario.Begin();
+            Debug.Log($"Scenario reset and started: {scenario.name}");
+        }
+        else
+        {
+            Debug.LogError("Cannot reset scenario - no scenario assigned!");
+        }
     }
 
     // Update is called once per frame
     void Update () {
-		if (Input.GetMouseButtonDown(0)) {
+
+        if (!isInitialized) return; // Don't update if not properly initialized
+
+        if (Input.GetMouseButtonDown(0)) {
             //Debug.Log("Left Click");			
             HandleTouchWalls();
 		}
@@ -184,10 +214,51 @@ public class Game : MonoBehaviour
         }
     }
 
+    void InitializeGame()
+    {
+        // Reset time scale to ensure normal game speed
+        Time.timeScale = 1f;
 
+        playerHealth = startingPlayerHealth;
+        currency = 0;
+        score = 0;
+        numTowers = 15;
+        numWalls = 15;
+        isGameOverOrCleared = false;
+
+        UpdateUI();
+
+        // Debug asset setup
+        if (scenario == null)
+        {
+            Debug.LogError("No GameScenario assigned!");
+            return;
+        }
+
+        if (board == null)
+        {
+            Debug.LogError("No GameBoard assigned!");
+            return;
+        }
+
+        board.Initialize(boardSize, tileContentFactory, numSpawnPoints, numDestinations);
+        board.ShowGrid = true;
+
+        // Clear any existing enemies
+        enemies.Clear();
+
+        isInitialized = true;
+        Debug.Log("Game initialization complete");
+    }
 
     public static void SpawnEnemy(EnemyFactory factory, EnemyType type)
     {
+        if (instance == null)
+        {
+            Debug.LogError("Game instance is null! Cannot spawn enemy.");
+            return;
+        }
+
         //Debug.Log($"SpawnEnemy called: factory={factory.name}, type={type}");
         if (instance.board.SpawnPointCount == 0)
         {
@@ -205,12 +276,16 @@ public class Game : MonoBehaviour
 
     public static void EnemyReachedDestination()
     {
+        if (instance == null) return;
+
         instance.playerHealth -= 1;
         instance.healthBar.ReduceHealth(1); // Update the UI
     }
 
     public static void EnemyHasBeenKilled()
     {
+        if (instance == null) return;
+
         instance.currency += 1;
         instance.score += 1;
         instance.numWalls += 1;
@@ -310,7 +385,9 @@ public class Game : MonoBehaviour
         numWalls = 15;
         UpdateUI();
 
-        activeScenario = scenario.Begin();
+        //activeScenario = scenario.Begin();
+        // Reset scenario to start fresh
+        ResetScenario();
     }
 
     void HandleAlternativeTouch () {
@@ -357,5 +434,15 @@ public class Game : MonoBehaviour
         gameClearText.SetActive(true);
         Debug.Log("NewGamePanel is set to Active");
         NewGamePanel.SetActive(true);
+    }
+
+    // Clean up when leaving the scene
+    void OnDestroy()
+    {
+        Debug.Log("Game instance destroyed");
+        if (instance == this)
+        {
+            instance = null;
+        }
     }
 }

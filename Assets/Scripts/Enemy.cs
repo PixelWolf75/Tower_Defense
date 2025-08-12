@@ -77,7 +77,7 @@ public class Enemy : GameBehaviour
 
     public void SpawnOn(GameTile tile)
     {
-        Debug.Assert(tile.NextTileOnPath != null, "Nowhere to go!", this);
+        //Debug.Assert(tile.NextTileOnPath != null, "Nowhere to go!", this);
         tileFrom = tile;
         tileTo = tile.NextTileOnPath;
         positionFrom = tileFrom.transform.localPosition;
@@ -87,12 +87,12 @@ public class Enemy : GameBehaviour
         // Show health bar when spawned
         if (healthBarManager != null)
         {
-            Debug.Log($"[{gameObject.name}] Found healthBarManager, calling ShowHealthBar(true)");
+            //Debug.Log($"[{gameObject.name}] Found healthBarManager, calling ShowHealthBar(true)");
             healthBarManager.ShowHealthBar(true);
         }
         else
         {
-            Debug.LogError($"[{gameObject.name}] healthBarManager is null in SpawnOn!");
+            //Debug.LogError($"[{gameObject.name}] healthBarManager is null in SpawnOn!");
         }
     }
 

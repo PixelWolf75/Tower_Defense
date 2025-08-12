@@ -21,7 +21,7 @@ public class Blink : MonoBehaviour
         currentInterval = startInterval;
 
         renderers = GetComponentsInChildren<Renderer>();
-        Debug.Log($"Found {renderers.Length} renderers to blink");
+        //Debug.Log($"Found {renderers.Length} renderers to blink");
     }
 
     public void StartBlinking()

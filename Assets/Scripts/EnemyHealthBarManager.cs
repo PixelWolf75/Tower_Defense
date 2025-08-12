@@ -85,7 +85,7 @@ public class EnemyHealthBarManager : MonoBehaviour
         if (healthBarInstance != null)
         {
             healthBarInstance.SetActive(show);
-            Debug.Log($"[{gameObject.name}] Health bar visibility set to: {show}");
+            //Debug.Log($"[{gameObject.name}] Health bar visibility set to: {show}");
         }
     }
 

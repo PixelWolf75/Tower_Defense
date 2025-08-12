@@ -14,65 +14,86 @@ public class Brightness : MonoBehaviour
 
     [SerializeField]
     PostProcessLayer layer;
-    AutoExposure exposure;
-
+    ColorGrading colorGrading;
     // Start is called before the first frame update
     void Start()
     {
-        brightness.TryGetSettings(out exposure);
+        // Get AutoExposure from profile
+        if (brightness != null)
+        {
+            brightness.TryGetSettings(out colorGrading);
+        }
 
-        // Load saved brightness setting
+        // Set up slider
+        if (brightnessSlider != null)
+        {
+            // Add listener for slider changes
+            brightnessSlider.onValueChanged.AddListener(OnSliderChanged);
+        }
+
+        // Load and apply saved settings
+        StartCoroutine(LoadBrightnessFromSettingsDelayed());
+    }
+
+    IEnumerator LoadBrightnessFromSettingsDelayed()
+    {
+        // Wait for SettingsManager to be ready
+        while (SettingsManager.instance == null)
+        {
+            yield return null;
+        }
+
         LoadBrightnessFromSettings();
-
-        AdjustBrightness();
     }
 
     void LoadBrightnessFromSettings()
     {
         if (SettingsManager.instance != null)
         {
-            // Load the saved brightness value
             float savedBrightness = SettingsManager.instance.currentBrightness;
-
-            // Apply to post process
-            exposure.keyValue.value = savedBrightness;
-
-            // Update slider to match saved value
             if (brightnessSlider != null)
-            {
                 brightnessSlider.value = savedBrightness;
-            }
-
-            Debug.Log($"Loaded brightness setting: {savedBrightness}");
+            if (colorGrading != null)
+                colorGrading.postExposure.value = savedBrightness;
         }
         else
         {
-            Debug.LogWarning("SettingsManager not found! Using default brightness.");
+            Debug.LogWarning("SettingsManager not found!");
         }
     }
 
+    // Called when slider value changes
+    void OnSliderChanged(float newValue)
+    {
+        AdjustBrightness(newValue);
+    }
+
+    public void AdjustBrightness(float newBrightness)
+    {
+        if (colorGrading != null)
+            colorGrading.postExposure.value = newBrightness;
+
+        if (SettingsManager.instance != null)
+            SettingsManager.instance.SetBrightness(newBrightness);
+
+        Debug.Log($"Brightness adjusted to: {newBrightness}");
+    }
+
+    // Public method you can call from UI button if needed
     public void AdjustBrightness()
     {
-        if (exposure == null) return;
-
-        if (brightnessSlider.value != 0)
+        if (brightnessSlider != null)
         {
-            exposure.keyValue.value = brightnessSlider.value;
-        }
-        else
-        {
-            exposure.keyValue.value = 0.05f;
-        }
-
-        // Save to SettingsManager
-        if (SettingsManager.instance != null)
-        {
-            SettingsManager.instance.SetBrightness(brightnessSlider.value);
+            AdjustBrightness(brightnessSlider.value);
         }
     }
 
     void OnDestroy()
     {
-
+        // Clean up listener
+        if (brightnessSlider != null)
+        {
+            brightnessSlider.onValueChanged.RemoveListener(OnSliderChanged);
+        }
     }
 }
