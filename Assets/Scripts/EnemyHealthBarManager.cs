@@ -26,7 +26,7 @@ public class EnemyHealthBarManager : MonoBehaviour
             Debug.Log(mainCamera);
         }
 
-        CreateHealthBar();
+        //CreateHealthBar();
     }
 
     void CreateHealthBar()

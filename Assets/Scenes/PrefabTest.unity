@@ -2159,6 +2159,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boardSize: {x: 3, y: 3}
+  numDestinations: 1
+  numSpawnPoints: 1
   tileContentFactory: {fileID: 11400000, guid: 2d2686bae0bdd204c8947249b482be45, type: 2}
   gameOverText: {fileID: 2031513441}
   gameClearText: {fileID: 405848796}

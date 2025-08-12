@@ -116,11 +116,11 @@ public class Game : MonoBehaviour
     void Update () {
 		if (Input.GetMouseButtonDown(0)) {
             //Debug.Log("Left Click");			
-            HandleTouch();
+            HandleTouchWalls();
 		}
         else if (Input.GetMouseButtonDown(1)) {
             //Debug.Log("Right Click");
-			HandleAlternativeTouch();
+			HandleTouchTowers();
 		}
 
         if (Input.GetKeyDown(KeyCode.V))
@@ -184,6 +184,8 @@ public class Game : MonoBehaviour
         }
     }
 
+
+
     public static void SpawnEnemy(EnemyFactory factory, EnemyType type)
     {
         //Debug.Log($"SpawnEnemy called: factory={factory.name}, type={type}");
@@ -246,6 +248,40 @@ public class Game : MonoBehaviour
             UpdateUI();
         }
 	}
+
+    void HandleTouchWalls()
+    {
+        GameTile tile = board.GetTile(TouchRay);
+        if (tile != null)
+        {
+            if (numWalls > 0)
+            {
+                if (board.ToggleWall(tile))
+                {
+                    numWalls--;
+                }
+            }
+        }
+
+        UpdateUI();
+    }
+
+    void HandleTouchTowers()
+    {
+        GameTile tile = board.GetTile(TouchRay);
+        if (tile != null)
+        {
+            if (numTowers > 0)
+            {
+                if (board.ToggleTower(tile))
+                {
+                    numTowers--;
+                }
+            }
+        }
+
+        UpdateUI();
+    }
 
     void UpdateUI()
     {
