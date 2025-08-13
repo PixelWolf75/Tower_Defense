@@ -61,6 +61,18 @@ public class Game : MonoBehaviour
     [SerializeField]
     HealthBar healthBar = default;
 
+    // Reference to settingsManager
+    private SettingsManager settingsManager;
+
+    // Events for health bar managers to subscribe to
+    public System.Action<bool> OnHealthBarsToggled;
+
+    // Scene-specific settings
+    [Header("Scene Settings")]
+    public bool showArrows = true;
+    public bool showGrid = true;
+    public bool showEnemyHealthBars = true;
+
     //float spawnProgress;
 
     int playerHealth;
@@ -122,9 +134,38 @@ public class Game : MonoBehaviour
             InitializeGame();
         }
 
+        ConnectToSceneSettings();
+
+        // Apply initial settings from SettingsManager
+        ApplyInitialSettings();
+
         // Force scenario to start fresh
         ResetScenario();
     }
+
+    void ConnectToSceneSettings()
+    {
+        settingsManager = FindAnyObjectByType< SettingsManager>();
+        if (settingsManager != null)
+        {
+            // Subscribe to settings events
+            settingsManager.OnArrowsToggled += SetShowPaths;
+            settingsManager.OnGridToggled += SetShowGrid;
+            settingsManager.OnHealthBarsToggled += SetShowEnemyHealthBars;
+
+            // Get current settings from the manager
+            showArrows = settingsManager.showArrows;
+            showGrid = settingsManager.showGrid;
+            showEnemyHealthBars = settingsManager.showEnemyHealthBars;
+
+            Debug.Log("Game connected to settingsManager");
+        }
+        else
+        {
+            Debug.LogWarning("No settingsManager found in scene");
+        }
+    }
+
 
     void ResetScenario()
     {
@@ -139,10 +180,20 @@ public class Game : MonoBehaviour
         }
     }
 
+    // Add this method to apply initial settings
+    void ApplyInitialSettings()
+    {
+
+        SetShowPaths(showArrows);
+        SetShowGrid(showGrid);
+        SetShowEnemyHealthBars(showEnemyHealthBars);
+    }
+
     // Update is called once per frame
     void Update () {
 
         if (!isInitialized) return; // Don't update if not properly initialized
+
 
         if (Input.GetMouseButtonDown(0)) {
             //Debug.Log("Left Click");			
@@ -155,12 +206,51 @@ public class Game : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.V))
         {
-            board.ShowPaths = !board.ShowPaths;
+            //board.ShowPaths = !board.ShowPaths;
+            // Toggle arrows directly
+            if (settingsManager != null)
+            {
+                settingsManager.ToggleArrows();
+            }
+            else
+            {
+                SetShowPaths(!showArrows);
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.G))
         {
-            board.ShowGrid = !board.ShowGrid;
+            // Toggle grid directly
+            if (settingsManager != null)
+            {
+                settingsManager.ToggleGrid();
+            }
+            else
+            {
+                SetShowGrid(!showGrid);
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            // Toggle health bars directly
+            if (settingsManager != null)
+            {
+                settingsManager.ToggleHealthBars();
+            }
+            else
+            {
+                SetShowEnemyHealthBars(!showEnemyHealthBars);
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            // Toggle audio/music and sync UI
+            if (settingsManager != null)
+            {
+                settingsManager.ToggleAudio();
+            }
         }
 
         /*
@@ -212,6 +302,44 @@ public class Game : MonoBehaviour
             Physics.SyncTransforms();
             board.GameUpdate();
         }
+    }
+
+    // Public methods to handle settings changes
+    public void SetShowPaths(bool show)
+    {
+        showArrows = show;
+        if (board != null)
+        {
+            board.ShowPaths = show;
+            Debug.Log($"Paths visibility set to: {show}");
+        }
+    }
+
+    public void SetShowGrid(bool show)
+    {
+        showGrid = show;
+        if (board != null)
+        {
+            board.ShowGrid = show;
+            Debug.Log($"Grid visibility set to: {show}");
+        }
+    }
+
+    public void SetShowEnemyHealthBars(bool show)
+    {
+        showEnemyHealthBars = show;
+
+        // Notify all health bar managers
+        OnHealthBarsToggled?.Invoke(show);
+
+        // Apply to all existing health bar managers in current scene
+        EnemyHealthBarManager[] healthBarManagers = Object.FindObjectsByType<EnemyHealthBarManager>(FindObjectsSortMode.None);
+        foreach (var manager in healthBarManagers)
+        {
+            manager.SetHealthBarEnabled(show);
+        }
+
+        Debug.Log($"Enemy health bars visibility set to: {show}");
     }
 
     void InitializeGame()
@@ -439,7 +567,14 @@ public class Game : MonoBehaviour
     // Clean up when leaving the scene
     void OnDestroy()
     {
-        Debug.Log("Game instance destroyed");
+        // Unsubscribe from settings events
+        if (settingsManager != null)
+        {
+            settingsManager.OnArrowsToggled -= SetShowPaths;
+            settingsManager.OnGridToggled -= SetShowGrid;
+            settingsManager.OnHealthBarsToggled -= SetShowEnemyHealthBars;
+        }
+
         if (instance == this)
         {
             instance = null;

@@ -16,6 +16,11 @@ public class EnemyHealthBarManager : MonoBehaviour
     private GameObject healthBarInstance;
     private Canvas healthBarCanvas;
 
+    private bool healthBarsEnabled = true;
+
+    // Public getter for other scripts to check if health bars are enabled for this enemy
+    public bool AreHealthBarsEnabled => healthBarsEnabled && healthBarInstance != null;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -26,11 +31,25 @@ public class EnemyHealthBarManager : MonoBehaviour
             Debug.Log(mainCamera);
         }
 
-        //CreateHealthBar();
+        // Find the Game script in the scene to get health bar setting
+        Game gameScript = FindAnyObjectByType<Game>();
+        if (gameScript != null)
+        {
+            healthBarsEnabled = gameScript.showEnemyHealthBars;
+            gameScript.OnHealthBarsToggled += SetHealthBarEnabled;
+        }
+
+        if (healthBarsEnabled)
+        {
+            CreateHealthBar();
+        }
     }
 
     void CreateHealthBar()
     {
+        // Don't create if health bars are disabled or already exists
+        if (!healthBarsEnabled || healthBarInstance != null)
+            return;
 
         if (healthBarPrefab != null && mainCamera != null)
         {
@@ -58,7 +77,7 @@ public class EnemyHealthBarManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (healthBarInstance != null && mainCamera != null)
+        if (healthBarsEnabled && healthBarInstance != null && mainCamera != null)
         {
             // Update health bar position to follow enemy
             healthBarInstance.transform.position = transform.position + healthBarOffset;
@@ -71,7 +90,7 @@ public class EnemyHealthBarManager : MonoBehaviour
 
     public void UpdateHealth(float currentHealth, float maxHealth)
     {
-        if (healthBarComponent != null)
+        if (healthBarComponent != null && healthBarsEnabled)
         {
             // Convert to percentage and update
             int healthPercentage = Mathf.RoundToInt((currentHealth / maxHealth) * 100f);
@@ -84,13 +103,39 @@ public class EnemyHealthBarManager : MonoBehaviour
     {
         if (healthBarInstance != null)
         {
-            healthBarInstance.SetActive(show);
-            //Debug.Log($"[{gameObject.name}] Health bar visibility set to: {show}");
+            bool shouldShow = show && healthBarsEnabled;
+            healthBarInstance.SetActive(shouldShow);
         }
+    }
+
+    // Called by SettingsManager when health bar setting changes
+    public void SetHealthBarEnabled(bool enabled)
+    {
+        healthBarsEnabled = enabled;
+
+        if (enabled && healthBarInstance == null)
+        {
+            // Create health bar if it doesn't exist and we're enabling
+            CreateHealthBar();
+        }
+        else if (healthBarInstance != null)
+        {
+            // Show/hide existing health bar based on setting
+            healthBarInstance.SetActive(enabled);
+        }
+
+        Debug.Log($"[{gameObject.name}] Health bar enabled set to: {enabled}");
     }
 
     void OnDestroy()
     {
+        // Unsubscribe from events
+        Game gameScript = FindAnyObjectByType< Game>();
+        if (gameScript != null)
+        {
+            gameScript.OnHealthBarsToggled -= SetHealthBarEnabled;
+        }
+
         // Clean up health bar when enemy is destroyed
         if (healthBarInstance != null)
         {
